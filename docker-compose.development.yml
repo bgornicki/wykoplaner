@@ -1,0 +1,50 @@
+version: "3.2"
+services:
+  
+  backend:
+    image: wykoplaner-backend
+    secrets:
+      - JWT_SECRET
+      - VAULT_SECRET
+      - API_KEY
+      - API_SECRET
+    environment:
+      - WAIT_HOSTS=mongo:27017
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/dist:/app/dist
+
+  frontend:
+    image: wykoplaner-frontend
+    secrets:
+      - JWT_SECRET
+
+  vault:
+    image: vault
+    ports:
+      - 8200:8200
+    volumes:
+      - ./vault/config:/vault/config:rw
+      - vault_db:/vault/file:rw
+    entrypoint: vault server -config=/vault/config/vault.json
+
+  mongo:
+    image: mongodb
+    ports:
+    - 27017:27017
+    volumes:
+     - mongo_db:/data/db
+
+volumes:
+  mongo_db:
+  vault_db:
+
+secrets:
+  JWT_SECRET:
+    external: true
+  VAULT_SECRET:
+    external: true
+  API_KEY:
+    external: true
+  API_SECRET:
+    external: true

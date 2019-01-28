@@ -1,0 +1,32 @@
+version: "3.2"
+services:
+  
+  backend:
+    image: wykoplaner-backend
+
+  frontend:
+    image: wykoplaner-frontend
+
+  vault:
+    image: vault
+    ports:
+      - 8200:8200
+    volumes:
+      - ./vault/config:/vault/config:rw
+      - vault_db:/vault/file:rw
+    entrypoint: vault server -config=/vault/config/vault.json
+
+  mongo:
+    image: mongodb
+    volumes:
+     - mongo_db:/data/db
+
+volumes:
+  mongo_db:
+  vault_db:
+
+secrets:
+  JWT_SECRET:
+    external: true
+  VAULT_SECRET:
+    external: true
